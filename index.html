@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ma Carte Perso</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d2f36; --bg2:#123f48; --sand:#f3e5c8; --ink:#12262b; --muted:#9fb8bb;
+  --accent:#e0452a; --line:rgba(243,229,200,.18); --card:#f3e5c8; --card-ink:#12262b;
+  --radius:14px;
+}
+*{box-sizing:border-box;margin:0}
+html,body{min-height:100%}
+body{
+  font-family:'Instrument Sans',system-ui,sans-serif;
+  background:
+    radial-gradient(900px 500px at 85% -10%,#1b5a66 0,transparent 60%),
+    var(--bg);
+  color:var(--sand); line-height:1.5;
+}
+h1,h2,.display{font-family:'Syne',system-ui,sans-serif}
+.wrap{max-width:1080px;margin:auto;padding:28px 18px 60px;display:grid;gap:34px;grid-template-columns:1fr}
+@media(min-width:900px){.wrap{grid-template-columns:1.05fr .95fr;align-items:start;padding-top:56px}}
+header{grid-column:1/-1}
+h1{font-size:clamp(2rem,6vw,3.6rem);font-weight:800;line-height:1.02;letter-spacing:-.02em;max-width:14ch}
+header p{color:var(--muted);margin-top:12px;max-width:46ch}
+
+/* form */
+form{display:grid;gap:18px}
+fieldset{border:0;padding:0;display:grid;gap:10px}
+legend{font-family:'Syne';font-weight:600;font-size:1.05rem;padding:0 0 8px}
+.row{display:grid;gap:12px;grid-template-columns:1fr 1fr}
+@media(max-width:520px){.row{grid-template-columns:1fr}}
+label{font-size:.88rem;color:var(--muted);display:grid;gap:6px}
+input[type=text],select,textarea{
+  width:100%;font:inherit;color:var(--sand);background:var(--bg2);
+  border:1.5px solid var(--line);border-radius:10px;padding:11px 13px;
+}
+textarea{resize:vertical;min-height:70px}
+input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible,.chip input:focus-visible+span,.swatch input:focus-visible+span,.emo input:focus-visible+span{
+  outline:3px solid var(--accent);outline-offset:2px
+}
+input[aria-invalid=true]{border-color:var(--accent)}
+.err{color:#ff9b87;font-size:.82rem;min-height:1em}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.agebox{display:flex;align-items:center;gap:14px}
+.agebox output{font-family:'Syne';font-weight:800;font-size:1.6rem;min-width:2.4ch}
+
+.chips,.swatches,.emos{display:flex;flex-wrap:wrap;gap:8px}
+.chip,.swatch,.emo{position:relative;cursor:pointer}
+.chip input,.swatch input,.emo input{position:absolute;opacity:0;inset:0}
+.chip span{display:block;padding:7px 13px;border:1.5px solid var(--line);border-radius:99px;font-size:.9rem;transition:.15s}
+.chip input:checked+span{background:var(--sand);color:var(--ink);border-color:var(--sand)}
+.swatch span{display:block;width:34px;height:34px;border-radius:50%;border:3px solid transparent;box-shadow:0 0 0 1.5px var(--line)}
+.swatch input:checked+span{border-color:var(--bg);box-shadow:0 0 0 3px var(--sand)}
+.emo span{display:grid;place-items:center;width:44px;height:44px;font-size:1.5rem;border-radius:12px;border:1.5px solid var(--line)}
+.emo input:checked+span{background:var(--sand);border-color:var(--sand)}
+
+.progress{height:8px;border-radius:9px;background:var(--bg2);overflow:hidden}
+.progress i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
+.pl{display:flex;justify-content:space-between;font-size:.85rem;color:var(--muted)}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+button{font:inherit;font-weight:600;cursor:pointer;border-radius:10px;padding:12px 20px;border:1.5px solid var(--sand);background:transparent;color:var(--sand)}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+button:active{transform:translateY(1px)}
+
+/* card */
+.stage{position:sticky;top:20px;perspective:900px;display:grid;gap:16px}
+.card{
+  --c:#e0452a;
+  background:var(--card);color:var(--card-ink);border-radius:22px;padding:22px;
+  aspect-ratio:3/4.1;display:flex;flex-direction:column;position:relative;overflow:hidden;
+  box-shadow:0 30px 60px -20px rgba(0,0,0,.6);
+  transform:rotateX(var(--rx,0)) rotateY(var(--ry,0));transition:transform .15s;
+}
+.card::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(circle at var(--gx,50%) var(--gy,0%),rgba(255,255,255,.55),transparent 45%);mix-blend-mode:soft-light}
+.band{position:absolute;inset:0 0 auto 0;height:42%;background:var(--c);
+  clip-path:polygon(0 0,100% 0,100% 62%,0 100%);transition:background .3s}
+.top{position:relative;display:flex;justify-content:space-between;color:#fff;font-size:.8rem;font-weight:600}
+.avatar{position:relative;width:96px;height:96px;border-radius:50%;background:var(--card);
+  display:grid;place-items:center;font-size:3.2rem;margin-top:22px;border:5px solid var(--card)}
+.name{position:relative;font-family:'Syne';font-weight:800;font-size:1.65rem;line-height:1.05;margin-top:30px;word-break:break-word}
+.meta{position:relative;font-size:.92rem;opacity:.8;margin-top:6px}
+.age{position:absolute;right:20px;top:92px;font-family:'Syne';font-weight:800;font-size:3.4rem;color:#fff;line-height:1}
+.age small{display:block;font-size:.7rem;font-weight:600;text-align:right}
+.tags{position:relative;display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.tags b{font-weight:600;font-size:.78rem;padding:4px 10px;border-radius:99px;background:var(--card-ink);color:var(--card)}
+.quote{position:relative;margin-top:auto;font-size:.95rem;border-left:4px solid var(--c);padding-left:12px;font-style:italic;min-height:2.6em}
+.empty{opacity:.45}
+.toast{background:var(--bg2);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;font-size:.9rem;display:none}
+.toast.show{display:block}
+.toast pre{margin-top:8px;white-space:pre-wrap;font-size:.78rem;color:var(--muted);max-height:140px;overflow:auto}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Fabrique ta carte perso</h1>
+    <p>Remplis la fiche, la carte se dessine en direct. Bouge la souris dessus pour l’incliner.</p>
+  </header>
+
+  <form id="f" novalidate>
+    <fieldset>
+      <legend>Qui es-tu ?</legend>
+      <div class="row">
+        <label>Prénom
+          <input type="text" id="prenom" autocomplete="given-name" maxlength="20" placeholder="Radhi">
+          <span class="err" id="e-prenom"></span>
+        </label>
+        <label>Nom
+          <input type="text" id="nom" autocomplete="family-name" maxlength="20" placeholder="Ben Salah">
+          <span class="err" id="e-nom"></span>
+        </label>
+      </div>
+      <label>Âge
+        <span class="agebox"><input type="range" id="age" min="15" max="60" value="18"><output id="ageOut">18</output></span>
+      </label>
+      <div class="row">
+        <label>Ville
+          <input type="text" id="ville" maxlength="24" placeholder="Nabeul">
+        </label>
+        <label>Études / métier
+          <select id="job">
+            <option value="">Choisir</option>
+            <option>Étudiant en informatique</option>
+            <option>Développeur</option>
+            <option>Designer</option>
+            <option>Sportif</option>
+            <option>Autre</option>
+          </select>
+        </label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Tes passions (3 max)</legend>
+      <div class="chips" id="chips"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Ton style</legend>
+      <div class="emos" id="emos" role="radiogroup" aria-label="Avatar"></div>
+      <div class="swatches" id="swatches" role="radiogroup" aria-label="Couleur"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Ta phrase</legend>
+      <label>Une citation qui te représente
+        <textarea id="quote" maxlength="80" placeholder="Petit à petit, l’oiseau fait son nid."></textarea>
+      </label>
+    </fieldset>
+
+    <div>
+      <div class="pl"><span>Fiche complétée</span><span id="pct">0%</span></div>
+      <div class="progress" aria-hidden="true"><i id="bar"></i></div>
+    </div>
+
+    <div class="actions">
+      <button type="submit" class="primary">Enregistrer la fiche</button>
+      <button type="button" id="reset">Tout effacer</button>
+    </div>
+  </form>
+
+  <div class="stage">
+    <article class="card" id="card" aria-live="polite">
+      <div class="band"></div>
+      <div class="top"><span>CARTE PERSO</span><span id="c-ville" class="empty">Ville</span></div>
+      <div class="age"><small>ans</small><span id="c-age">18</span></div>
+      <div class="avatar" id="c-emo">😎</div>
+      <div class="name empty" id="c-name">Ton nom ici</div>
+      <div class="meta empty" id="c-job">Ton métier ou tes études</div>
+      <div class="tags" id="c-tags"></div>
+      <div class="quote empty" id="c-quote">Ta citation apparaîtra ici.</div>
+    </article>
+    <div class="toast" id="toast" role="status"></div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const KEY = 'fiche-perso-v1';
+const HOBBIES = ['Gym','Code','Gaming','Lecture','Foot','Musique','Voyage','Cuisine','Photo','Anglais'];
+const EMOJIS = ['😎','🧑‍💻','💪','🎮','📚','🦊','🚀','⚽'];
+const COLORS = ['#e0452a','#1f8a70','#2f6fdb','#d89b1d','#8a4fd6','#c2185b'];
+
+// build option controls
+$('chips').innerHTML = HOBBIES.map(h =>
+  `<label class="chip"><input type="checkbox" name="hob" value="${h}"><span>${h}</span></label>`).join('');
+$('emos').innerHTML = EMOJIS.map((e,i) =>
+  `<label class="emo"><input type="radio" name="emo" value="${e}" ${i===0?'checked':''} aria-label="Avatar ${i+1}"><span>${e}</span></label>`).join('');
+$('swatches').innerHTML = COLORS.map((c,i) =>
+  `<label class="swatch"><input type="radio" name="col" value="${c}" ${i===0?'checked':''} aria-label="Couleur ${i+1}"><span style="background:${c}"></span></label>`).join('');
+
+function read(){
+  return {
+    prenom: $('prenom').value.trim(),
+    nom: $('nom').value.trim(),
+    age: +$('age').value,
+    ville: $('ville').value.trim(),
+    job: $('job').value,
+    hobbies: [...document.querySelectorAll('[name=hob]:checked')].map(i => i.value),
+    emoji: document.querySelector('[name=emo]:checked').value,
+    color: document.querySelector('[name=col]:checked').value,
+    quote: $('quote').value.trim()
+  };
+}
+
+function render(){
+  const d = read();
+  $('ageOut').textContent = d.age;
+  $('c-age').textContent = d.age;
+  $('c-emo').textContent = d.emoji;
+  $('card').style.setProperty('--c', d.color);
+
+  const full = [d.prenom, d.nom].filter(Boolean).join(' ');
+  $('c-name').textContent = full || 'Ton nom ici';
+  $('c-name').classList.toggle('empty', !full);
+  $('c-ville').textContent = d.ville || 'Ville';
+  $('c-ville').classList.toggle('empty', !d.ville);
+  $('c-job').textContent = d.job || 'Ton métier ou tes études';
+  $('c-job').classList.toggle('empty', !d.job);
+  $('c-quote').textContent = d.quote || 'Ta citation apparaîtra ici.';
+  $('c-quote').classList.toggle('empty', !d.quote);
+  $('c-tags').innerHTML = d.hobbies.map(h => `<b>${h}</b>`).join('');
+
+  const checks = [d.prenom, d.nom, d.ville, d.job, d.hobbies.length, d.quote];
+  const pct = Math.round(checks.filter(Boolean).length / checks.length * 100);
+  $('pct').textContent = pct + '%';
+  $('bar').style.width = pct + '%';
+}
+
+// max 3 passions
+$('chips').addEventListener('change', e => {
+  const on = document.querySelectorAll('[name=hob]:checked');
+  if (on.length > 3) e.target.checked = false;
+});
+$('f').addEventListener('input', render);
+$('f').addEventListener('change', render);
+
+// 3D tilt
+const card = $('card');
+card.parentElement.addEventListener('pointermove', e => {
+  const r = card.getBoundingClientRect();
+  const x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+  card.style.setProperty('--ry', ((x - .5) * 14) + 'deg');
+  card.style.setProperty('--rx', ((.5 - y) * 14) + 'deg');
+  card.style.setProperty('--gx', (x * 100) + '%');
+  card.style.setProperty('--gy', (y * 100) + '%');
+});
+card.parentElement.addEventListener('pointerleave', () => {
+  ['--rx','--ry'].forEach(p => card.style.setProperty(p, '0deg'));
+});
+
+// validation + save
+function setErr(id, msg){
+  $('e-' + id).textContent = msg;
+  $(id).setAttribute('aria-invalid', msg ? 'true' : 'false');
+}
+$('f').addEventListener('submit', e => {
+  e.preventDefault();
+  const d = read();
+  const re = /^[A-Za-zÀ-ÿ\u0600-\u06FF' -]{2,}$/;
+  setErr('prenom', re.test(d.prenom) ? '' : 'Entre un prénom valide (2 lettres minimum).');
+  setErr('nom', re.test(d.nom) ? '' : 'Entre un nom valide (2 lettres minimum).');
+  if (!re.test(d.prenom) || !re.test(d.nom)) { $('prenom').focus(); return; }
+  try { localStorage.setItem(KEY, JSON.stringify(d)); } catch (_) {}
+  const t = $('toast');
+  t.classList.add('show');
+  t.innerHTML = 'Fiche enregistrée, ' + d.prenom + '.<pre></pre>';
+  t.querySelector('pre').textContent = JSON.stringify(d, null, 2);
+});
+
+$('reset').addEventListener('click', () => {
+  $('f').reset();
+  try { localStorage.removeItem(KEY); } catch (_) {}
+  $('toast').classList.remove('show');
+  setErr('prenom',''); setErr('nom','');
+  render();
+});
+
+// restore saved data
+try {
+  const s = JSON.parse(localStorage.getItem(KEY) || 'null');
+  if (s) {
+    $('prenom').value = s.prenom || ''; $('nom').value = s.nom || '';
+    $('age').value = s.age || 18; $('ville').value = s.ville || '';
+    $('job').value = s.job || ''; $('quote').value = s.quote || '';
+    document.querySelectorAll('[name=hob]').forEach(i => i.checked = (s.hobbies || []).includes(i.value));
+    document.querySelectorAll('[name=emo]').forEach(i => i.checked = i.value === s.emoji);
+    document.querySelectorAll('[name=col]').forEach(i => i.checked = i.value === s.color);
+  }
+} catch (_) {}
+render();
+</script>
+</body>
+</html>
